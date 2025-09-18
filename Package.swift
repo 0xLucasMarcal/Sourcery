@@ -15,26 +15,16 @@ var sourceryLibDependencies: [Target.Dependency] = [
     "StencilSwiftKit",
     .product(name: "SwiftSyntax", package: "swift-syntax"),
     "XcodeProj",
-    .product(name: "SwiftPM-auto", package: "swift-package-manager"),
 ]
 
 // Note: when Swift Linux doesn't bug out on [String: String], add a test back for it
 // See https://github.com/krzysztofzablocki/Sourcery/pull/1208#issuecomment-1752185381
-#if canImport(ObjectiveC)
 sourceryLibDependencies.append("TryCatch")
 let templatesTestsResourcesCopy: [Resource] = [
     .copy("Templates"),
     .copy("Tests/Context"),
     .copy("Tests/Expected")
 ]
-#else
-sourceryLibDependencies.append(.product(name: "Crypto", package: "swift-crypto"))
-let templatesTestsResourcesCopy: [Resource] = [
-    .copy("Templates"),
-    .copy("Tests/Context_Linux"),
-    .copy("Tests/Expected")
-]
-#endif
 
 // Note: when Swift Linux doesn't bug out on [String: String], add a test back for it
 // See https://github.com/krzysztofzablocki/Sourcery/pull/1208#issuecomment-1752185381
@@ -263,20 +253,10 @@ var dependencies: [Package.Dependency] = [
     .package(url: "https://github.com/Quick/Nimble.git", from: "9.0.0"),
 ]
 
-#if compiler(>=6.2)
-dependencies.append(.package(url: "https://github.com/swiftlang/swift-package-manager.git", revision: "3c17da7")) // release/6.2
-#else
-dependencies.append(.package(url: "https://github.com/art-divin/swift-package-manager.git", exact: "1.0.8"))
-#endif
-
-#if !canImport(ObjectiveC)
-dependencies.append(.package(url: "https://github.com/apple/swift-crypto.git", from: "3.0.0"))
-#endif
-
 let package = Package(
     name: "Sourcery",
     platforms: [
-        .macOS(.v13),
+        .macOS(.v10_15),
     ],
     products: [
         // SPM won't generate .swiftmodule for a target directly used by a product,

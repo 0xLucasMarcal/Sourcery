@@ -1,0 +1,177 @@
+name: Sourcery
+options:
+  bundleIdPrefix: com.krzysztofzablocki.sourcery
+  deploymentTarget:
+    macOS: 10.15
+  indentWidth: 4
+  tabWidth: 4
+
+packages:
+  Yams:
+    url: https://github.com/jpsim/Yams.git
+    from: 5.0.3
+  Commander:
+    url: https://github.com/kylef/Commander.git
+    exactVersion: 0.9.1
+  PathKit:
+    url: https://github.com/kylef/PathKit.git
+    exactVersion: 1.0.1
+  StencilSwiftKit:
+    url: https://github.com/art-divin/StencilSwiftKit.git
+    exactVersion: 2.10.4
+  XcodeProj:
+    url: https://github.com/tuist/XcodeProj.git
+    exactVersion: 8.24.6
+  SwiftSyntax:
+    url: https://github.com/swiftlang/swift-syntax.git
+    from: 602.0.0
+
+targets:
+  SourceryRuntime:
+    type: framework
+    platform: macOS
+    sources:
+      - path: SourceryRuntime/Sources
+        excludes: 
+          - "SourceryRuntime/Sources/Linux/**"
+    dependencies:
+      - package: StencilSwiftKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krzysztofzablocki.sourcery.SourceryRuntime
+        SWIFT_VERSION: 5.8
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+      configs:
+        Debug:
+          BUILD_LIBRARY_FOR_DISTRIBUTION: YES
+        Release:
+          BUILD_LIBRARY_FOR_DISTRIBUTION: YES
+
+  SourceryUtils:
+    type: framework
+    platform: macOS
+    sources:
+      - SourceryUtils/Sources
+    dependencies:
+      - package: PathKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krzysztofzablocki.sourcery.SourceryUtils
+        SWIFT_VERSION: 5.8
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+
+  SourceryFramework:
+    type: framework
+    platform: macOS
+    sources:
+      - path: SourceryFramework/Sources
+    dependencies:
+      - package: PathKit
+        link: true
+      - package: SwiftSyntax
+        product: SwiftSyntax
+      - package: SwiftSyntax
+        product: SwiftParser
+      - target: SourceryUtils
+      - target: SourceryRuntime
+        link: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krzysztofzablocki.sourcery.SourceryFramework
+        SWIFT_VERSION: 5.8
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+
+  SourceryStencil:
+    type: framework
+    platform: macOS
+    sources:
+      - SourceryStencil/Sources
+    dependencies:
+      - package: PathKit
+      - target: SourceryRuntime
+      - package: StencilSwiftKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krzysztofzablocki.sourcery.SourceryStencil
+        SWIFT_VERSION: 5.8
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+
+  SourceryJS:
+    type: framework
+    platform: macOS
+    sources:
+      - SourceryJS/Sources
+    dependencies:
+      - package: PathKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krzysztofzablocki.sourcery.SourceryJS
+        SWIFT_VERSION: 5.8
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+
+  SourcerySwift:
+    type: framework
+    platform: macOS
+    sources:
+      - SourcerySwift/Sources
+    dependencies:
+      - package: PathKit
+      - target: SourceryRuntime
+      - target: SourceryUtils
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krzysztofzablocki.sourcery.SourcerySwift
+        SWIFT_VERSION: 5.8
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+
+  TryCatch:
+    type: framework
+    platform: macOS
+    sources:
+      - TryCatch
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krzysztofzablocki.sourcery.TryCatch
+        SWIFT_VERSION: 5.8
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+
+  SourceryLib:
+    type: framework.static
+    platform: macOS
+    sources:
+      - path: Sourcery
+        excludes:
+          - "Sourcery/Templates/**"
+    dependencies:
+      - target: SourceryFramework
+      - target: SourceryRuntime
+      - target: SourceryStencil
+      - target: SourceryJS
+      - target: SourcerySwift
+      - package: Commander
+      - package: PathKit
+        link: true
+      - package: Yams
+      - package: StencilSwiftKit
+      - package: SwiftSyntax
+        product: SwiftSyntax
+      - package: XcodeProj
+      - target: TryCatch
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.krzysztofzablocki.sourcery.SourceryLib
+        SWIFT_VERSION: 5.8
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+      configs:
+        Debug:
+          BUILD_LIBRARY_FOR_DISTRIBUTION: YES
+        Release:
+          BUILD_LIBRARY_FOR_DISTRIBUTION: YES

@@ -3,10 +3,6 @@ import XcodeProj
 import PathKit
 import Yams
 import SourceryRuntime
-import Basics
-import TSCBasic
-import Workspace
-import PackageModel
 import SourceryFramework
 import SourceryUtils
 
@@ -168,46 +164,7 @@ public struct Package {
     }
 
     public init(dict: [String: Any], relativePath: Path) throws {
-        guard let packageRootPath = dict["path"] as? String else {
-            throw Configuration.Error.invalidSources(message: "Package file directory path is not provided. Expected string.")
-        }
-        let path = Path(packageRootPath, relativeTo: relativePath)
-        
-        let packagePath = try Basics.AbsolutePath(validating: path.string)
-        let observability = ObservabilitySystem { Log.verbose("\($0): \($1)") }
-        let workspace = try Workspace(forRootPackage: packagePath)
-
-        var manifestResult: Result<Manifest, Error>?
-        let semaphore = DispatchSemaphore(value: 0)
-        workspace.loadRootManifest(at: packagePath, observabilityScope: observability.topScope, completion: { result in
-            manifestResult = result
-            semaphore.signal()
-        })
-        semaphore.wait()
-        
-        guard let manifest = try manifestResult?.get() else {
-            throw Configuration.Error.invalidSources(message: "Unable to load manifest")
-        }
-        self.root = path
-        let targetNames: [String]
-        if let targets = dict["target"] as? [String] {
-            targetNames = targets
-        } else if let target = dict["target"] as? String {
-            targetNames = [target]
-        } else {
-            throw Configuration.Error.invalidSources(message: "'target' key is missing. Expected object or array of objects.")
-        }
-        let sourcesPath = Path("Sources", relativeTo: path)
-        self.targets = manifest.targets.compactMap({ target in
-            guard targetNames.contains(target.name) else {
-                return nil
-            }
-            let rootPath = target.path.map { Path($0, relativeTo: path) } ?? Path(target.name, relativeTo: sourcesPath)
-            let excludePaths = target.exclude.map { path in
-                Path(path, relativeTo: rootPath)
-            }
-            return Target(name: target.name, root: rootPath, excludes: excludePaths)
-        })
+        fatalError()
     }
 }
 
